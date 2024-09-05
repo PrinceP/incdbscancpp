@@ -10,24 +10,6 @@
 #include <algorithm>
 
 class INCDBSCAN {
-private:
-    struct VectorHash {
-        size_t operator()(const std::vector<double>& v) const {
-            std::hash<double> hasher;
-            size_t seed = 0;
-            for (double i : v) {
-                seed ^= hasher(i) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-            }
-            return seed;
-        }
-    };
-
-    struct VectorEqual {
-        bool operator()(const std::vector<double>& lhs, const std::vector<double>& rhs) const {
-            return lhs == rhs;
-        }
-    };
-
 public:
     INCDBSCAN(double eps, int minPts, int dimensions, KDTree& kdTree)
         : eps(eps), minPts(minPts), kdTree(kdTree), nextClusterId(0) {}
@@ -91,7 +73,7 @@ public:
             expandCluster(point, neighbors, newClusterId);
         } else {
             // Not enough neighbors to form a cluster, mark point as noise
-            noise.insert(point);
+            noise.push_back(point);
             kdTree.updateClusterId(point, -1);  // Mark as noise in KDTree
         }
     }
@@ -102,14 +84,15 @@ public:
         // Add point to the cluster in both the KDTree and the local clusters map
         clusters[clusterId].push_back(point);
         kdTree.updateClusterId(point, clusterId);  // Update cluster ID in KDTree
-        noise.erase(point);
+        noise.erase(std::remove(noise.begin(), noise.end(), point), noise.end());
+
 
         for (const auto& neighbor : neighbors) {
             if (isNoise(neighbor)) {
                 // Neighbor was previously marked as noise, add to the cluster
                 clusters[clusterId].push_back(neighbor);
                 kdTree.updateClusterId(neighbor, clusterId);
-                noise.erase(neighbor);
+                noise.erase(std::remove(noise.begin(), noise.end(), neighbor), noise.end());
             } else if (!isAssignedToCluster(neighbor)) {
                 // Neighbor is not yet assigned to any cluster, add it and expand
                 clusters[clusterId].push_back(neighbor);
@@ -161,12 +144,13 @@ private:
     int minPts;
     KDTree& kdTree;
     std::unordered_map<int, std::vector<std::vector<double>>> clusters;
-    std::unordered_set<std::vector<double>, VectorHash, VectorEqual> noise;
+    std::vector<std::vector<double>> noise;
+
     int nextClusterId;
 
     bool isNoise(const std::vector<double>& point) const {
         std::cout << "Checking if point is noise: " << point[0] << ", " << point[1] << std::endl;
-        return noise.find(point) != noise.end();
+        return std::find(noise.begin(), noise.end(), point) != noise.end();
     }
 
     bool isAssignedToCluster(const std::vector<double>& point) const {
