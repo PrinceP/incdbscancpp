@@ -142,7 +142,7 @@ int main() {
     for (size_t i = 0; i < shuffled_doubleData1.size(); ++i) {
         std::string output_file = "clusters.txt";
         std::ofstream outfile(output_file, std::ios_base::app);
-        std::string cluster = "Cluster " + std::to_string(clusterLabels[i]);
+        std::string cluster = std::to_string(clusterLabels[i]);
         std::string result = shuffled_labels1[i] + "," + cluster;
         outfile << result << std::endl;
         outfile.close();
@@ -172,7 +172,7 @@ int main() {
     for (size_t i = 0; i < shuffled_doubleData2.size(); ++i) {
         std::string output_file = "incclusters.txt";
         std::ofstream outfile(output_file, std::ios_base::app);
-        std::string cluster = "Cluster " + std::to_string(incclusterLabels[i]);
+        std::string cluster = std::to_string(incclusterLabels[i]);
         std::string result = shuffled_labels2[i] + "," + cluster;
         outfile << result << std::endl;
         outfile.close();

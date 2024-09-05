@@ -55,7 +55,8 @@ public:
             int newClusterId;
             if (neighborClusterIds.empty()) {
                 //No core points found, with a label
-                
+                newClusterId = -1;
+                std::cout << "No core points found, with a label" << std::endl;
             } else if (neighborClusterIds.size() == 1) {
                 // All neighbors belong to the same cluster, use that cluster ID
                 std::cout << "All neighbors belong to the same cluster." << std::endl;
