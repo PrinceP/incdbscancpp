@@ -145,7 +145,7 @@ int main() {
     int dimensions = 512;
     KDTree kdTree(dimensions);
 
-    DBSCAN dbscan(eps, minPts, dimensions, kdTree);
+    DBSCAN dbscan(eps, minPts, kdTree);
     std::cout << "DBSCAN declared with eps " << eps << ", minPts " << minPts << ", and " << dimensions << "D vectors" << std::endl;
 
     start = std::chrono::high_resolution_clock::now();
@@ -174,7 +174,7 @@ int main() {
     std::chrono::duration<double> print_time = end - start;
     std::cout << "Time taken to print clusters: " << print_time.count() << " seconds." << std::endl;
 
-    INCDBSCAN incdbscan(eps, minPts, dimensions, kdTree);
+    INCDBSCAN incdbscan(eps, minPts, kdTree);
     std::cout << "INCDBSCAN declared with eps " << eps << ", minPts " << minPts << ", and " << dimensions << "D vectors" << std::endl;
 
     incdbscan.cluster(doubleData2);

@@ -9,8 +9,8 @@
 
 class DBSCAN {
 public:
-    DBSCAN(double eps, int minPts, int dimensions, KDTree& kdTree)
-        : eps(eps), minPts(minPts), dimensions(dimensions), kdTree(kdTree), clusterID(0) {}
+    DBSCAN(double eps, int minPts, KDTree& kdTree)
+        : eps(eps), minPts(minPts), kdTree(kdTree), clusterID(0) {}
 
     void cluster(const std::vector<std::vector<double>>& points) {
         // Initialize all points as not visited
@@ -43,7 +43,6 @@ public:
 private:
     double eps;
     int minPts;
-    int dimensions;
     int clusterID;
     KDTree& kdTree;
     std::vector<bool> visited;

@@ -11,7 +11,7 @@
 
 class INCDBSCAN {
 public:
-    INCDBSCAN(double eps, int minPts, int dimensions, KDTree& kdTree)
+    INCDBSCAN(double eps, int minPts, KDTree& kdTree)
         : eps(eps), minPts(minPts), kdTree(kdTree), nextClusterId(0) {}
 
     void cluster(const std::vector<std::vector<double>>& points) {
