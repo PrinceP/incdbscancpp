@@ -21,37 +21,42 @@ public:
         for (const auto& point : points) {
             kdTree.insert(point);
         }
-        for (const auto& point : points) {
-            insertPoint(point);
+        //Call insertPoint for each point with index
+        for (int i = 0; i < points.size(); i++) {
+            insertPoint(points[i], i);
         }
 
     }
 
-    void insertPoint(const std::vector<double>& point) {
-        std::cout << "Inserting point: " << point[0] << ", " << point[1] << std::endl;
+    void insertPoint(const std::vector<double>& point, int index) {
         
         // Step 1: Find neighbors using the KD-Tree radius search
         auto neighbors = kdTree.radiusSearch(point, eps);
-        std::cout << "Found " << neighbors.size() << " neighbors." << std::endl;
+        std::cout << "Found " << neighbors.size() << " neighbors." << " for index " << index << std::endl;
         
-        // Step 2: If neighbors are greater than or equal to minPts, form or expand a cluster
+        // Step 2: If neighbors are greater than or equal to minPts
         if (neighbors.size() >= minPts) {
-            std::cout << "Forming a cluster with " << neighbors.size() << " points." << std::endl;
             
             // Step 3: Collect the cluster IDs of the neighbors from the KDTree
             std::unordered_set<int> neighborClusterIds;
             for (const auto& neighbor : neighbors) {
                 int neighborClusterId = kdTree.getClusterId(neighbor);
-                std::cout << "Neighbor cluster ID: " << neighborClusterId << std::endl;
                 if (neighborClusterId != -1) {
                     neighborClusterIds.insert(neighborClusterId);
-                    std::cout << "Adding neighbor cluster ID: " << neighborClusterId << std::endl;
                 }
             }
-
+            //Display the cluster IDs of the neighbors
+            std::cout << "Neighbor cluster IDs: ";
+            for (const auto& clusterId : neighborClusterIds) {
+                std::cout << clusterId << " ";
+            }
+            std::cout << std::endl;
             // Step 4: Decide on a cluster ID for the current point
             int newClusterId;
-            if (neighborClusterIds.size() == 1) {
+            if (neighborClusterIds.empty()) {
+                //No core points found, with a label
+                
+            } else if (neighborClusterIds.size() == 1) {
                 // All neighbors belong to the same cluster, use that cluster ID
                 std::cout << "All neighbors belong to the same cluster." << std::endl;
                 newClusterId = *neighborClusterIds.begin();
@@ -69,27 +74,17 @@ public:
                 }
             }
 
-            std::cout << "New cluster ID: " << newClusterId << std::endl;
-            
-            // Step 5: Expand the cluster with the new or existing cluster ID
-            expandCluster(point, neighbors, newClusterId);
+            std::cout << "Final cluster ID: " << newClusterId << " for point " << index << std::endl;
+            clusters[index] = newClusterId;
+            visited[index] = true;
         } else {
             // Not enough neighbors to form a cluster, mark point as noise
+            std::cout << "Not enough neighbors to form a cluster, marking point as noise." << std::endl;
+            clusters[index] = -1;
+            visited[index] = true;
         }
     }
 
-    void expandCluster(const std::vector<double>& point, const std::vector<std::vector<double>>& neighbors, int clusterId) {
-        std::cout << "Expanding cluster " << clusterId << " with point: " << point[0] << ", " << point[1] << std::endl;
-        
-        // Add point to the cluster in both the KDTree and the local clusters map
-        clusters.push_back(clusterId);
-        kdTree.updateClusterId(point, clusterId);  // Update cluster ID in KDTree
-        
-
-        std::cout << "Expanding cluster " << clusterId << " with neighbor: " << neighbors.size() << std::endl;
-        for (const auto& neighbor : neighbors) {
-        }
-    }
 
     int getClusterId(const std::vector<double>& point) const {
         // Retrieve the cluster ID directly from the KDTree
@@ -112,7 +107,6 @@ private:
     KDTree& kdTree;
     std::vector<bool> visited;
     std::vector<int> clusters;
-
     int nextClusterId;
 
 };

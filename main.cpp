@@ -140,6 +140,14 @@ int main() {
     std::vector<std::string> labels2(labels.begin() + sliced_index, labels.begin() + 2*sliced_index);
     std::vector<std::string> labels3(labels.begin() + 2*sliced_index, labels.end());
 
+    //Size of the data
+    std::cout << "Size of the data1: " << doubleData1.size() << std::endl;
+    std::cout << "Size of the data2: " << doubleData2.size() << std::endl;
+    std::cout << "Size of the data3: " << doubleData3.size() << std::endl;
+    std::cout << "Size of the labels1: " << labels1.size() << std::endl;
+    std::cout << "Size of the labels2: " << labels2.size() << std::endl;
+    std::cout << "Size of the labels3: " << labels3.size() << std::endl;
+
     double eps = 1.0;
     int minPts = 5;
     int dimensions = 512;
@@ -178,6 +186,7 @@ int main() {
 
 
     //INCDBSCAN
+    eps = 1.1;
     std::cout << "Starting INCDBSCAN with clusterID " << clusterID << std::endl;
     std::cout << "KDTree size: " << kdTree.size() << std::endl;
     INCDBSCAN incdbscan(eps, minPts, kdTree, clusterID);
