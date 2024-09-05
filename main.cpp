@@ -49,76 +49,6 @@ std::vector<std::vector<float>> load_npy_files(const std::string& base_dir, std:
 }
 
 
-std::vector<std::vector<double>> generatePoints(int count, int dimensions) {
-    std::vector<std::vector<double>> points;
-    std::default_random_engine generator(std::chrono::system_clock::now().time_since_epoch().count());
-    
-    // Create 3 clusters and some noise
-    std::vector<std::vector<double>> centers = {
-        std::vector<double>(dimensions, 0.0),
-        std::vector<double>(dimensions, 5.0),
-        std::vector<double>(dimensions, 10.0)
-    };
-
-    std::normal_distribution<double> cluster_dist(0.0, 1.0);
-    std::uniform_real_distribution<double> noise_dist(0.0, 15.0);
-
-    for (int i = 0; i < count; ++i) {
-        std::vector<double> point(dimensions);
-        if (i < count * 0.9) {  // 90% of points in clusters
-            int cluster = i % 3;
-            for (int j = 0; j < dimensions; ++j) {
-                point[j] = centers[cluster][j] + cluster_dist(generator);
-            }
-        } else {  // 10% noise
-            for (int j = 0; j < dimensions; ++j) {
-                point[j] = noise_dist(generator);
-            }
-        }
-        points.push_back(point);
-    }
-
-    return points;
-}
-
-double euclideanDistance(const std::vector<double>& a, const std::vector<double>& b) {
-    double sum = 0.0;
-    for (size_t i = 0; i < a.size(); ++i) {
-        double diff = a[i] - b[i];
-        sum += diff * diff;
-    }
-    return std::sqrt(sum);
-}
-
-//IncDBSCAN
-// void printClusterSummary(const DBSCAN& dbscan, const std::vector<std::vector<double>>& points) {
-//     const auto& clusters = dbscan.getClusters();
-//     std::cout << "Number of clusters: " << clusters.size() << std::endl;
-//     for (const auto& [id, cluster] : clusters) {
-//         std::cout << "Cluster " << id << " size: " << cluster.size() << std::endl;
-//         if (!cluster.empty()) {
-//             double sum = std::accumulate(cluster[0].begin(), cluster[0].end(), 0.0);
-//             double mean = sum / cluster[0].size();
-//             std::cout << "  First point mean value: " << std::fixed << std::setprecision(2) << mean << std::endl;
-//         }
-//     }
-    
-//     // Count noise points
-//     int noise_count = 0;
-//     for (const auto& point : points) {
-//         bool in_cluster = false;
-//         for (const auto& [id, cluster] : clusters) {
-//             if (std::find(cluster.begin(), cluster.end(), point) != cluster.end()) {
-//                 in_cluster = true;
-//                 break;
-//             }
-//         }
-//         if (!in_cluster) noise_count++;
-//     }
-//     std::cout << "Noise points: " << noise_count << std::endl;
-//     std::cout << std::endl;
-// }
-
 int main() {
 
     std::string base_dir = "./../python/TESTING_SET/";
@@ -147,6 +77,44 @@ int main() {
     std::cout << "Size of the labels1: " << labels1.size() << std::endl;
     std::cout << "Size of the labels2: " << labels2.size() << std::endl;
     std::cout << "Size of the labels3: " << labels3.size() << std::endl;
+    // Randomize the data and labels for doubleData1 and labels1
+    // Create a vector of indices
+    std::vector<size_t> indices(doubleData1.size());
+    std::iota(indices.begin(), indices.end(), 0);
+
+    // Shuffle the indices
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(indices.begin(), indices.end(), g);
+
+    // Create new vectors to store shuffled data
+    std::vector<std::vector<double>> shuffled_doubleData1(doubleData1.size());
+    std::vector<std::string> shuffled_labels1(labels1.size());
+
+    // Use the shuffled indices to reorder both doubleData1 and labels1
+    for (size_t i = 0; i < indices.size(); ++i) {
+        shuffled_doubleData1[i] = doubleData1[indices[i]];
+        shuffled_labels1[i] = labels1[indices[i]];
+    }
+
+
+    //Randomize the data and labels for doubleData2 and labels2
+    // Create a vector of indices
+    std::vector<size_t> indices2(doubleData2.size());
+    std::iota(indices2.begin(), indices2.end(), 0);
+
+    // Shuffle the indices
+    std::shuffle(indices2.begin(), indices2.end(), g);
+    
+    // Create new vectors to store shuffled data
+    std::vector<std::vector<double>> shuffled_doubleData2(doubleData2.size());
+    std::vector<std::string> shuffled_labels2(labels2.size());
+
+    // Use the shuffled indices to reorder both doubleData2 and labels2
+    for (size_t i = 0; i < indices2.size(); ++i) {
+        shuffled_doubleData2[i] = doubleData2[indices2[i]];
+        shuffled_labels2[i] = labels2[indices2[i]];
+    }
 
     double eps = 1.0;
     int minPts = 5;
@@ -159,7 +127,7 @@ int main() {
     std::cout << "DBSCAN declared with eps " << eps << ", minPts " << minPts << ", and " << dimensions << "D vectors" << std::endl;
 
     start = std::chrono::high_resolution_clock::now();
-    dbscan.cluster(doubleData1);
+    dbscan.cluster(shuffled_doubleData1);
     std::cout << "DBSCAN clustered" << std::endl;
     
     end = std::chrono::high_resolution_clock::now();
@@ -171,11 +139,11 @@ int main() {
     std::vector<int> clusterLabels;
     dbscan.getClustersLabels(clusterLabels, clusterID);
     // Dump it into a file
-    for (size_t i = 0; i < doubleData1.size(); ++i) {
+    for (size_t i = 0; i < shuffled_doubleData1.size(); ++i) {
         std::string output_file = "clusters.txt";
         std::ofstream outfile(output_file, std::ios_base::app);
         std::string cluster = "Cluster " + std::to_string(clusterLabels[i]);
-        std::string result = labels[i] + "," + cluster;
+        std::string result = shuffled_labels1[i] + "," + cluster;
         outfile << result << std::endl;
         outfile.close();
 
@@ -192,7 +160,7 @@ int main() {
     INCDBSCAN incdbscan(eps, minPts, kdTree, clusterID);
     std::cout << "INCDBSCAN declared with eps " << eps << ", minPts " << minPts << ", and " << dimensions << "D vectors" << std::endl;
 
-    incdbscan.cluster(doubleData2);
+    incdbscan.cluster(shuffled_doubleData2);
     std::cout << "INCDBSCAN clustered" << std::endl;
     start = std::chrono::high_resolution_clock::now();
     std::vector<int> incclusterLabels;
@@ -201,11 +169,11 @@ int main() {
     std::cout << "INCDBSCAN clusterID: " << incclusterID << std::endl;
     
     // Dump it into a file
-    for (size_t i = 0; i < doubleData2.size(); ++i) {
+    for (size_t i = 0; i < shuffled_doubleData2.size(); ++i) {
         std::string output_file = "incclusters.txt";
         std::ofstream outfile(output_file, std::ios_base::app);
         std::string cluster = "Cluster " + std::to_string(incclusterLabels[i]);
-        std::string result = labels2[i] + "," + cluster;
+        std::string result = shuffled_labels2[i] + "," + cluster;
         outfile << result << std::endl;
         outfile.close();
 
@@ -213,75 +181,6 @@ int main() {
     end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> incprint_time = end - start;
     std::cout << "Time taken to print clusters: " << incprint_time.count() << " seconds." << std::endl;
-
-
-
-    /*
-    std::vector<std::vector<double>> points = generatePoints(15, dimensions);
-
-    // Print some diagnostic information
-    std::cout << "Diagnostic Information:" << std::endl;
-    std::cout << "Number of points: " << points.size() << std::endl;
-    
-    // Calculate and print the distance between the first two points
-    if (points.size() >= 2) {
-        double distance = euclideanDistance(points[0], points[1]);
-        std::cout << "Distance between first two points: " << distance << std::endl;
-    }
-
-    // Count how many points are within eps distance of the first point
-    int nearby_points = 0;
-    for (size_t i = 1; i < points.size(); ++i) {
-        if (euclideanDistance(points[0], points[i]) <= eps) {
-            nearby_points++;
-        }
-    }
-    std::cout << "Points within eps distance of the first point: " << nearby_points << std::endl;
-
-    std::cout << "\nInitial Clustering:" << std::endl;
-    // Perform initial clustering
-    dbscan.cluster(points);
-    for (const auto& [id, cluster] : dbscan.getClusters()) {
-        std::cout << "Cluster " << id << ": ";
-        for (const auto& point : cluster) {
-            std::cout << "(" << point[0] << " -- " << point[511] << ") ";
-        }
-        std::cout << std::endl;
-    }
-    printClusterSummary(dbscan, points);
-    std::cout << std::endl;
-    
-    // Insert a new point
-    std::vector<double> newPoint(dimensions, 2.5);  // A point with all values set to 2.5
-    dbscan.insertPoint(newPoint);
-    points.push_back(newPoint);
-    std::cout << "\nClustering after inserting a new point:" << std::endl;
-    std::cout << "(" << points[points.size()-1][0] << " -- " << points[points.size()-1][511] << ") \n";
-    for (const auto& [id, cluster] : dbscan.getClusters()) {
-        std::cout << "Cluster " << id << ": ";
-        for (const auto& point : cluster) {
-            std::cout << "(" << point[0] << " -- " << point[511] << ") ";
-        }
-        std::cout << std::endl;
-    }
-    printClusterSummary(dbscan, points);
-    std::cout << std::endl;
-
-    // Remove a point
-    std::cout << "\nClustering after removing point:" << std::endl;
-    dbscan.removePoint(points[0]);
-    std::cout << "(" << points[0][0] << " -- " << points[0][511] << ") \n";
-    
-    points.erase(points.begin());
-    for (const auto& [id, cluster] : dbscan.getClusters()) {
-        std::cout << "Cluster " << id << ": ";
-        for (const auto& point : cluster) {
-            std::cout << "(" << point[0] << " -- " << point[511] << ") ";
-        }
-        std::cout << std::endl;
-    }
-    printClusterSummary(dbscan, points);
-    std::cout << std::endl;
-    */   
+   
     return 0;
 }
