@@ -64,9 +64,19 @@ public:
             std::cout << "Point not found in the tree." << std::endl;
         }
     }
+    //Get the size of the tree
+    int size() const {
+        return sizeRec(root);
+    }
+
 private:
     int dimensions;
     NodePtr root;
+
+    int sizeRec(NodePtr node) const {
+        if (!node) return 0;
+        return 1 + sizeRec(node->left) + sizeRec(node->right);
+    }
 
     NodePtr insertRec(NodePtr node, const std::vector<double>& point, int depth) {
         if (!node) return std::make_shared<Node>(point);

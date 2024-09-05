@@ -11,12 +11,13 @@
 
 class INCDBSCAN {
 public:
-    INCDBSCAN(double eps, int minPts, KDTree& kdTree)
-        : eps(eps), minPts(minPts), kdTree(kdTree), nextClusterId(0) {}
+    INCDBSCAN(double eps, int minPts, KDTree& kdTree, int& clusterID)
+        : eps(eps), minPts(minPts), kdTree(kdTree), nextClusterId(clusterID) {}
 
     void cluster(const std::vector<std::vector<double>>& points) {
-        clusters.clear();
-        noise.clear();
+        // Initialize all points as not visited
+        visited.assign(points.size(), false);
+        clusters.assign(points.size(), -1);
         for (const auto& point : points) {
             kdTree.insert(point);
         }
@@ -62,7 +63,8 @@ public:
                 for (const auto& neighbor : neighbors) {
                     int oldClusterId = kdTree.getClusterId(neighbor);
                     if (oldClusterId != -1 && oldClusterId != newClusterId) {
-                        reassignClusterId(neighbor, oldClusterId, newClusterId);
+                        std::cout << "Reassigning cluster ID: " << oldClusterId << " to " << newClusterId << std::endl;
+                        kdTree.updateClusterId(neighbor, newClusterId);
                     }
                 }
             }
@@ -73,8 +75,6 @@ public:
             expandCluster(point, neighbors, newClusterId);
         } else {
             // Not enough neighbors to form a cluster, mark point as noise
-            noise.push_back(point);
-            kdTree.updateClusterId(point, -1);  // Mark as noise in KDTree
         }
     }
 
@@ -82,26 +82,12 @@ public:
         std::cout << "Expanding cluster " << clusterId << " with point: " << point[0] << ", " << point[1] << std::endl;
         
         // Add point to the cluster in both the KDTree and the local clusters map
-        clusters[clusterId].push_back(point);
+        clusters.push_back(clusterId);
         kdTree.updateClusterId(point, clusterId);  // Update cluster ID in KDTree
-        noise.erase(std::remove(noise.begin(), noise.end(), point), noise.end());
+        
 
-
+        std::cout << "Expanding cluster " << clusterId << " with neighbor: " << neighbors.size() << std::endl;
         for (const auto& neighbor : neighbors) {
-            if (isNoise(neighbor)) {
-                // Neighbor was previously marked as noise, add to the cluster
-                clusters[clusterId].push_back(neighbor);
-                kdTree.updateClusterId(neighbor, clusterId);
-                noise.erase(std::remove(noise.begin(), noise.end(), neighbor), noise.end());
-            } else if (!isAssignedToCluster(neighbor)) {
-                // Neighbor is not yet assigned to any cluster, add it and expand
-                clusters[clusterId].push_back(neighbor);
-                kdTree.updateClusterId(neighbor, clusterId);
-                auto newNeighbors = kdTree.radiusSearch(neighbor, eps);
-                if (newNeighbors.size() >= minPts) {
-                    expandCluster(neighbor, newNeighbors, clusterId);
-                }
-            }
         }
     }
 
@@ -110,32 +96,13 @@ public:
         return kdTree.getClusterId(point);
     }
 
-    void reassignClusterId(const std::vector<double>& point, int oldClusterId, int newClusterId) {
-        // Remove point from old cluster and reassign to new cluster
-        auto& oldCluster = clusters[oldClusterId];
-        auto it = std::find(oldCluster.begin(), oldCluster.end(), point);
-        if (it != oldCluster.end()) {
-            oldCluster.erase(it);
-            clusters[newClusterId].push_back(point);
-            kdTree.updateClusterId(point, newClusterId);  // Update in KDTree
-        }
-
-        if (oldCluster.empty()) {
-            clusters.erase(oldClusterId);
-        }
-    }
-
-
-    const std::unordered_map<int, std::vector<std::vector<double>>>& getClusters() const {
-        return clusters;
-    }
-
-    void getClustersLabels(std::vector<int>& clusterIds) {
+    void getClustersLabels(std::vector<int>& clusterIds, int& clusterID) {
         clusterIds.clear();
         clusterIds.reserve(clusters.size());
-        for (const auto& [id, cluster] : clusters) {
-            clusterIds.push_back(id);
+        for (const auto& cluster : clusters) {
+            clusterIds.push_back(cluster);
         }
+        clusterID = nextClusterId;
     }
 
 
@@ -143,28 +110,11 @@ private:
     double eps;
     int minPts;
     KDTree& kdTree;
-    std::unordered_map<int, std::vector<std::vector<double>>> clusters;
-    std::vector<std::vector<double>> noise;
+    std::vector<bool> visited;
+    std::vector<int> clusters;
 
     int nextClusterId;
 
-    bool isNoise(const std::vector<double>& point) const {
-        std::cout << "Checking if point is noise: " << point[0] << ", " << point[1] << std::endl;
-        return std::find(noise.begin(), noise.end(), point) != noise.end();
-    }
-
-    bool isAssignedToCluster(const std::vector<double>& point) const {
-        std::cout << "Checking if point is assigned to a cluster: " << point[0] << ", " << point[1] << std::endl;
-        std::cout << "Clusters size: " << clusters.size() << std::endl;
-        for (const auto& [id, cluster] : clusters) {
-            std::cout << "Cluster ID: " << id << std::endl;
-            if (std::find(cluster.begin(), cluster.end(), point) != cluster.end()) {
-                return true;
-            }
-        }
-        std::cout << "Point is not assigned to any cluster." << std::endl;
-        return false;
-    }
 };
 
 #endif // INCDBSCAN_H

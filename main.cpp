@@ -144,8 +144,10 @@ int main() {
     int minPts = 5;
     int dimensions = 512;
     KDTree kdTree(dimensions);
+    std::cout << "KDTree size: " << kdTree.size() << std::endl;
 
-    DBSCAN dbscan(eps, minPts, kdTree);
+    int clusterID = 0;
+    DBSCAN dbscan(eps, minPts, kdTree, clusterID);
     std::cout << "DBSCAN declared with eps " << eps << ", minPts " << minPts << ", and " << dimensions << "D vectors" << std::endl;
 
     start = std::chrono::high_resolution_clock::now();
@@ -159,7 +161,7 @@ int main() {
 
     start = std::chrono::high_resolution_clock::now();
     std::vector<int> clusterLabels;
-    dbscan.getClustersLabels(clusterLabels);
+    dbscan.getClustersLabels(clusterLabels, clusterID);
     // Dump it into a file
     for (size_t i = 0; i < doubleData1.size(); ++i) {
         std::string output_file = "clusters.txt";
@@ -174,22 +176,26 @@ int main() {
     std::chrono::duration<double> print_time = end - start;
     std::cout << "Time taken to print clusters: " << print_time.count() << " seconds." << std::endl;
 
-    INCDBSCAN incdbscan(eps, minPts, kdTree);
+
+    //INCDBSCAN
+    std::cout << "Starting INCDBSCAN with clusterID " << clusterID << std::endl;
+    std::cout << "KDTree size: " << kdTree.size() << std::endl;
+    INCDBSCAN incdbscan(eps, minPts, kdTree, clusterID);
     std::cout << "INCDBSCAN declared with eps " << eps << ", minPts " << minPts << ", and " << dimensions << "D vectors" << std::endl;
 
     incdbscan.cluster(doubleData2);
     std::cout << "INCDBSCAN clustered" << std::endl;
     start = std::chrono::high_resolution_clock::now();
     std::vector<int> incclusterLabels;
-    incdbscan.getClustersLabels(incclusterLabels);
+    int incclusterID;
+    incdbscan.getClustersLabels(incclusterLabels, incclusterID);
+    std::cout << "INCDBSCAN clusterID: " << incclusterID << std::endl;
     
     // Dump it into a file
     for (size_t i = 0; i < doubleData2.size(); ++i) {
         std::string output_file = "incclusters.txt";
-        std::cout << i << std::endl;
         std::ofstream outfile(output_file, std::ios_base::app);
         std::string cluster = "Cluster " + std::to_string(incclusterLabels[i]);
-        std::cout << cluster << std::endl;
         std::string result = labels2[i] + "," + cluster;
         outfile << result << std::endl;
         outfile.close();

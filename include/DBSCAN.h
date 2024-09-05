@@ -9,8 +9,8 @@
 
 class DBSCAN {
 public:
-    DBSCAN(double eps, int minPts, KDTree& kdTree)
-        : eps(eps), minPts(minPts), kdTree(kdTree), clusterID(0) {}
+    DBSCAN(double eps, int minPts, KDTree& kdTree, int& clusterID)
+        : eps(eps), minPts(minPts), kdTree(kdTree), clusterID(clusterID) {}
 
     void cluster(const std::vector<std::vector<double>>& points) {
         // Initialize all points as not visited
@@ -32,12 +32,13 @@ public:
         }
     }
 
-    void getClustersLabels(std::vector<int>& clusterIds) {
+    void getClustersLabels(std::vector<int>& clusterIds, int& clusterID) {
         clusterIds.clear();
         clusterIds.reserve(clusters.size());
         for (int cluster : clusters) {
             clusterIds.push_back(cluster);
         }
+        clusterID = this->clusterID;
     }
 
 private:
