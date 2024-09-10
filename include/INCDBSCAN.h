@@ -8,6 +8,7 @@
 #include <cmath>
 #include <functional>
 #include <algorithm>
+#include <stack>
 
 class INCDBSCAN {
 public:
@@ -15,6 +16,7 @@ public:
         : eps(eps), minPts(minPts), kdTree(kdTree), nextClusterId(clusterID) {}
 
     void cluster(const std::vector<std::vector<double>>& points) {
+        this->points = points;
         // Initialize all points as not visited
         visited.assign(points.size(), false);
         clusters.assign(points.size(), -1);
@@ -23,66 +25,136 @@ public:
         }
         //Call insertPoint for each point with index
         for (int i = 0; i < points.size(); i++) {
-            insertPoint(points[i], i);
+            if (!visited[i]) {
+                insertPoint(points[i], i);
+            }
+        }
+        //Update the cluster ID of the points in the KDTree
+        for(int i = 0; i < points.size(); i++){
+            int clusterID = clusters[i];
+            kdTree.assignClusterID(points[i], clusterID);
+        }
+        //Optimize the merge_cluster_pairs by removing the duplicate pairs
+        std::sort(merge_cluster_pairs.begin(), merge_cluster_pairs.end());
+        merge_cluster_pairs.erase(std::unique(merge_cluster_pairs.begin(), merge_cluster_pairs.end()), merge_cluster_pairs.end());
+
+        for(auto merge_cluster_pair : merge_cluster_pairs){
+            // std::cout << "Merging clusters " << merge_cluster_pair.first << " to " << merge_cluster_pair.second << std::endl;
+            kdTree.mergeClusters(merge_cluster_pair.first, merge_cluster_pair.second);
+        }
+
+        for(int i = 0; i < points.size(); i++){    
+            // std::cout << "Point " << i << " is in cluster " << kdTree.getClusterId(points[i]) << std::endl;
+            clusters[i] = kdTree.getClusterId(points[i]);
         }
 
     }
 
+    std::vector<std::vector<double>> findCorePoints(const std::vector<std::vector<double>>& neighbors) {
+        std::vector<std::vector<double>> corePoints;
+        for(auto neighbor : neighbors){
+            //TODO: Done
+            auto neighbors_of_neighbor = kdTree.radiusSearch(neighbor, eps);
+            if(neighbors_of_neighbor.size() >= minPts){
+                corePoints.push_back(neighbor);
+            }
+        }
+        return corePoints;
+    }
+
     void insertPoint(const std::vector<double>& point, int index) {
         
-        // Step 1: Find neighbors using the KD-Tree radius search
+        // Step 1.1: Find neighborhood of current new point
         auto neighbors = kdTree.radiusSearch(point, eps);
-        std::cout << "Found " << neighbors.size() << " neighbors." << " for index " << index << std::endl;
+        // Debug
+        // std::cout << "Found " << neighbors.size() << " neighbors." << " for index " << index << std::endl;
         
-        // Step 2: If neighbors are greater than or equal to minPts
-        if (neighbors.size() >= minPts) {
+        // Step 1.2: Find the core points with in the neighborhood
+        auto corePoints = findCorePoints(neighbors);
+        // Step 1.3: If no core points is found, assign noise to the current point
+        if(corePoints.empty()){
+            //Assign noise to the current point
+            clusters[index] = -1;
+            visited[index] = true;
+            return;
+        }
+        // Step 1.4: Get all the cluster IDs of the core points
+        std::set<int> labels_of_core_points;
+        for(auto core_point : corePoints){
+            int label = getClusterId(core_point);
+            //TODO: Done
+            if(label != -1){
+                labels_of_core_points.insert(label);
+            }
+        }
+        // Debug
+        // std::cout << "Labels of core points: " << labels_of_core_points.size() << std::endl;
+        // for(auto label : labels_of_core_points){
+        //     std::cout << " Label: " << label;
+        // }
+        // std::cout << std::endl;
+        // Step 1.5: If none of the core point is labeled
+        if(labels_of_core_points.size() == 0){
+            modified_expandCluster(corePoints, index, nextClusterId++);
+        }
+
+        // Step 1.6: If all the core points are labeled
+        else if(labels_of_core_points.size() == 1){
+            modified_expandCluster(corePoints, index, *labels_of_core_points.begin());
+        }
+
+        // Step 1.7: If the core points are labeled differently
+        else if(labels_of_core_points.size() > 1){
+            modified_expandCluster(corePoints, index, nextClusterId++);
+        }
+
+    }
+
+    void modified_expandCluster(const std::vector<std::vector<double>>& corePoints, int index, int clusterID){
+        std::vector<double> point = corePoints[0];
+       
+        // Debug
+        // std::cout << "Expanding cluster id " << clusterID << " on point index " << index << std::endl;
+        if(!visited[index]){
+            visited[index] = true;
+            clusters[index] = clusterID;
             
-            // Step 3: Collect the cluster IDs of the neighbors from the KDTree
-            std::unordered_set<int> neighborClusterIds;
-            for (const auto& neighbor : neighbors) {
-                int neighborClusterId = kdTree.getClusterId(neighbor);
-                if (neighborClusterId != -1) {
-                    neighborClusterIds.insert(neighborClusterId);
-                }
-            }
-            //Display the cluster IDs of the neighbors
-            std::cout << "Neighbor cluster IDs: ";
-            for (const auto& clusterId : neighborClusterIds) {
-                std::cout << clusterId << " ";
-            }
-            std::cout << std::endl;
-            // Step 4: Decide on a cluster ID for the current point
-            int newClusterId;
-            if (neighborClusterIds.empty()) {
-                //No core points found, with a label
-                newClusterId = -1;
-                std::cout << "No core points found, with a label" << std::endl;
-            } else if (neighborClusterIds.size() == 1) {
-                // All neighbors belong to the same cluster, use that cluster ID
-                std::cout << "All neighbors belong to the same cluster." << std::endl;
-                newClusterId = *neighborClusterIds.begin();
-            } else {
-                // Neighbors belong to different clusters, create a new cluster ID
-                std::cout << "Neighbors belong to different clusters, merging them." << std::endl;
-                newClusterId = nextClusterId++;
-                // Merge clusters by reassigning the new cluster ID to all neighbor points
-                for (const auto& neighbor : neighbors) {
-                    int oldClusterId = kdTree.getClusterId(neighbor);
-                    if (oldClusterId != -1 && oldClusterId != newClusterId) {
-                        std::cout << "Reassigning cluster ID: " << oldClusterId << " to " << newClusterId << std::endl;
-                        kdTree.updateClusterId(neighbor, newClusterId);
+            //Get the neighbors of the current point
+            auto neighbors = kdTree.radiusSearch(point, eps);
+            std::vector<int> neighbor_cluster_ids;
+            for(auto neighbor : neighbors){
+                //Find the cluster ID of the neighbor
+                int neighbor_cluster_id = getClusterId(neighbor);
+                int neighbor_index = std::distance(points.begin(), std::find(points.begin(), points.end(), neighbor));
+                
+                // std::cout << "Neighbor cluster id is " << neighbor_cluster_id << std::endl;
+                clusters[neighbor_index] = clusterID;
+                visited[neighbor_index] = true;
+                    
+                //TODO: Done Check Can we get the index of the neighbor
+                if(neighbor_cluster_id == -1){
+                    kdTree.assignClusterID(point, clusterID);
+                    
+                    // Debug
+                    // std::cout << "Assigned cluster ID " << clusterID << " to point " << index << std::endl;
+                    //Check if the neighbor is core point
+                    auto neighbor_core_points = findCorePoints(kdTree.radiusSearch(neighbor, eps));
+                    if(neighbor_core_points.size() >= minPts){
+                        // std::cout << "Expanding again cluster " << clusterID << " with neighbor core point " << neighbor_index << std::endl;
+                        modified_expandCluster(neighbor_core_points, neighbor_index, clusterID);
+                    }
+                }else{
+                    //TODO: Done Assign the visited
+                    auto neighbor_core_points = findCorePoints(kdTree.radiusSearch(neighbor, eps));
+                    // Debug
+                    // std::cout << "Neighbor core points size is " << neighbor_core_points.size() << std::endl;
+                    if(neighbor_core_points.size() >= minPts){
+                        // Debug
+                        // std::cout << "Merging clusters " << neighbor_cluster_id << " and " << clusterID << std::endl;
+                        merge_cluster_pairs.push_back(std::make_pair(neighbor_cluster_id, clusterID));
                     }
                 }
             }
-
-            std::cout << "Final cluster ID: " << newClusterId << " for point " << index << std::endl;
-            clusters[index] = newClusterId;
-            visited[index] = true;
-        } else {
-            // Not enough neighbors to form a cluster, mark point as noise
-            std::cout << "Not enough neighbors to form a cluster, marking point as noise." << std::endl;
-            clusters[index] = -1;
-            visited[index] = true;
         }
     }
 
@@ -109,6 +181,8 @@ private:
     std::vector<bool> visited;
     std::vector<int> clusters;
     int nextClusterId;
+    std::vector<std::vector<double>> points;
+    std::vector<std::pair<int, int>> merge_cluster_pairs;
 
 };
 

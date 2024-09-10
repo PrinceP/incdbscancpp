@@ -17,16 +17,21 @@ public:
         std::shared_ptr<Node> right;
         int clusterId;
         int tick;
+        bool visited_node;
 
-        Node(const std::vector<double>& pt) : point(pt), left(nullptr), right(nullptr), clusterId(-1), tick(0) {}
+        Node(const std::vector<double>& pt) : point(pt), left(nullptr), right(nullptr), clusterId(-1), tick(0), visited_node(false) {}
     };
 
     using NodePtr = std::shared_ptr<Node>;
 
     KDTree(int dimensions) : dimensions(dimensions), root(nullptr) {}
 
+    std::vector<NodePtr> nodes;
+
     void insert(const std::vector<double>& point) {
-        root = insertRec(root, point, 0);
+        NodePtr newNode = std::make_shared<Node>(point);
+        nodes.push_back(newNode);
+        root = insertRec(root, newNode, 0);
     }
 
     void remove(const std::vector<double>& point) {
@@ -69,6 +74,46 @@ public:
         return sizeRec(root);
     }
 
+    //Set the visited node
+    void setVisitedNode(const std::vector<double>& point, bool visited_node) {
+        NodePtr node = findNode(root, point, 0);
+        if (node) {
+            node->visited_node = visited_node;
+        }
+    }
+
+    //Check if the node is visited
+    bool isVisitedNode(const std::vector<double>& point) const {
+        NodePtr node = findNode(root, point, 0);
+        if (node) {
+            return node->visited_node;
+        }
+        return false;
+    }
+
+    //Set all nodes to unvisited
+    void setAllNodesToUnvisited() {
+        setAllNodesToUnvisitedRec(root);
+    }
+
+    //Set all nodes to unvisited recursively
+    void setAllNodesToUnvisitedRec(NodePtr node) {
+        if (node) {
+            node->visited_node = false;
+            setAllNodesToUnvisitedRec(node->left);
+            setAllNodesToUnvisitedRec(node->right);
+        }
+    }
+
+    //Merge clusterID1 to clusterID2
+    void mergeClusters(int clusterID1, int clusterID2) {
+        for (auto& node : nodes) {
+            if (node->clusterId == clusterID1) {
+                node->clusterId = clusterID2;
+            }
+        }
+    }
+
 private:
     int dimensions;
     NodePtr root;
@@ -78,14 +123,14 @@ private:
         return 1 + sizeRec(node->left) + sizeRec(node->right);
     }
 
-    NodePtr insertRec(NodePtr node, const std::vector<double>& point, int depth) {
-        if (!node) return std::make_shared<Node>(point);
+    NodePtr insertRec(NodePtr node, NodePtr newNode, int depth) {
+        if (!node) return newNode;
 
         int axis = depth % dimensions;
-        if (point[axis] < node->point[axis])
-            node->left = insertRec(node->left, point, depth + 1);
+        if (newNode->point[axis] < node->point[axis])
+            node->left = insertRec(node->left, newNode, depth + 1);
         else
-            node->right = insertRec(node->right, point, depth + 1);
+            node->right = insertRec(node->right, newNode, depth + 1);
 
         return node;
     }
