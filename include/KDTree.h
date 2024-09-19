@@ -9,6 +9,24 @@
 #include <cmath>
 #include <limits>
 
+struct VectorHash {
+    std::size_t operator()(const std::pair<std::vector<double>, double>& key) const {
+        std::size_t seed = 0;
+        for (double i : key.first) {
+            seed ^= std::hash<double>()(i) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        }
+        seed ^= std::hash<double>()(key.second) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        return seed;
+    }
+};
+
+struct VectorEqual {
+    bool operator()(const std::pair<std::vector<double>, double>& a, const std::pair<std::vector<double>, double>& b) const {
+        return a.second == b.second && a.first == b.first;
+    }
+};
+
+
 class KDTree {
 public:
     struct Node {
@@ -17,10 +35,14 @@ public:
         std::shared_ptr<Node> right;
         int clusterId;
         int tick;
+        int index;
         bool visited_node;
 
-        Node(const std::vector<double>& pt) : point(pt), left(nullptr), right(nullptr), clusterId(-1), tick(0), visited_node(false) {}
+        Node(const std::vector<double>& pt, int idx) : point(pt), left(nullptr), right(nullptr), clusterId(-1), tick(0), visited_node(false), index(idx) {}
     };
+
+    std::unordered_map<std::pair<std::vector<double>, double>, std::vector<std::vector<double>>, VectorHash, VectorEqual> radiusSearchCache;
+
 
     using NodePtr = std::shared_ptr<Node>;
 
@@ -28,8 +50,8 @@ public:
 
     std::vector<NodePtr> nodes;
 
-    void insert(const std::vector<double>& point) {
-        NodePtr newNode = std::make_shared<Node>(point);
+    void insert(const std::vector<double>& point, int index) {
+        NodePtr newNode = std::make_shared<Node>(point, index);
         nodes.push_back(newNode);
         root = insertRec(root, newNode, 0);
     }
@@ -41,6 +63,25 @@ public:
     std::vector<std::vector<double>> radiusSearch(const std::vector<double>& target, double radius) {
         std::vector<std::vector<double>> results;
         radiusSearchRec(root, target, radius, 0, results);
+        return results;
+    }
+ 
+    std::vector<std::vector<double>> radiusSearchUsingCache(const std::vector<double>& target, double radius) {
+        auto cacheKey = std::make_pair(target, radius);
+
+        // Check if the result is already in the cache
+        auto it = radiusSearchCache.find(cacheKey);
+        if (it != radiusSearchCache.end()) {
+            return it->second; // Return the cached result
+        }
+
+        // Perform the search if not cached
+        std::vector<std::vector<double>> results;
+        radiusSearchRec(root, target, radius, 0, results);
+
+        // Store the result in the cache
+        radiusSearchCache[cacheKey] = results;
+
         return results;
     }
 
@@ -112,6 +153,15 @@ public:
                 node->clusterId = clusterID2;
             }
         }
+    }
+
+    //Get the index of a point
+    int getIndex(const std::vector<double>& point) const {
+        NodePtr node = findNode(root, point, 0);
+        if (node) {
+            return node->index;
+        }
+        return -1;
     }
 
 private:

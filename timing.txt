@@ -1,0 +1,87 @@
+rm -rf clusters.txt
+rm -rf incclusters*.txt
+rm -rf combinedclusters.txt
+g++-11 main.cpp -I include/  -I ../vendor/ -std=c++20 -o main
+./main
+Time taken to load data: 0.355825 seconds.
+Size of the data1: 1000
+Size of the data2: 1000
+Size of the data3: 1000
+Size of the data4: 5533
+Size of the labels1: 1000
+Size of the labels2: 1000
+Size of the labels3: 1000
+Size of the labels4: 5533
+Size of the shuffled_doubleData1: 1000
+Size of the shuffled_labels1: 1000
+Size of the shuffled_doubleData2: 1000
+Size of the shuffled_labels2: 1000
+Size of the shuffled_doubleData3: 1000
+Size of the shuffled_labels3: 1000
+KDTree size: 0
+DBSCAN declared with eps 1, minPts 5, and 512D vectors
+KDTree size: 1000
+Time taken to insert all the points into the KDTree: 0.005111 seconds
+Time taken to expand cluster: 1.37999 seconds
+Time taken to expand cluster: 0.688969 seconds
+Time taken to expand cluster: 1.17759 seconds
+Time taken to expand cluster: 0.705555 seconds
+Time taken to expand cluster: 1.16555 seconds
+Time taken to expand cluster: 0.332788 seconds
+Time taken to expand cluster: 0.072966 seconds
+Time taken to expand cluster: 0.10343 seconds
+Time taken to expand cluster: 0.241347 seconds
+Time taken to expand cluster: 0.206413 seconds
+Time taken to expand cluster: 0.07257 seconds
+Time taken to expand cluster: 0.103641 seconds
+Time taken to cluster: 6.35719 seconds
+DBSCAN clustered
+Time taken to fit DBSCAN: 6.36234 seconds.
+Time taken to print clusters: 0.011794 seconds.
+-----------------------------------
+Starting INCDBSCAN with clusterID 12 startingIndex 1000
+INCDBSCAN declared with eps 1, minPts 5, and 512D vectors
+Starting INCDBSCAN with clusterID 12 startingIndex 1000
+KDTree size: 2000
+Time taken to insert all the points into the KDTree: 0.005308 seconds
+Newly added points size : 1000
+Time taken to expand cluster CASE A: 9.88439 seconds
+Time taken to expand cluster CASE A: 1.76292 seconds
+Unique labels for index 1002 and incoming clusterid 11 : 1
+ Label: 11
+Time taken to expand cluster CASE B: 6.92609 seconds
+Time taken to expand cluster CASE A: 0.584792 seconds
+Time taken to expand cluster CASE A: 0.734106 seconds
+Time taken to expand cluster CASE A: 1.33187 seconds
+Time taken to expand cluster CASE A: 4.07011 seconds
+Time taken to expand cluster CASE A: 1.41317 seconds
+Time taken to expand cluster CASE A: 0.980055 seconds
+Time taken to call insertPoint for each point: 27.9009 seconds
+Time taken to merge the clusters: 0 seconds
+INCDBSCAN clustered
+INCDBSCAN clusterID: 20
+Time taken to print clusters: 0.0119397 seconds.
+-----------------------------------
+Starting INCDBSCAN with clusterID 20 startingIndex 2000
+KDTree size: 3000
+Time taken to insert all the points into the KDTree: 0.005713 seconds
+Newly added points size : 1000
+Time taken to expand cluster CASE A: 2.38462 seconds
+Time taken to expand cluster CASE A: 3.58597 seconds
+Time taken to expand cluster CASE A: 11.4902 seconds
+Time taken to expand cluster CASE A: 3.97014 seconds
+Time taken to expand cluster CASE A: 0.500696 seconds
+Time taken to expand cluster CASE A: 1.04971 seconds
+Time taken to expand cluster CASE A: 1.23169 seconds
+Time taken to expand cluster CASE A: 2.50209 seconds
+Time taken to expand cluster CASE A: 0.775512 seconds
+Time taken to expand cluster CASE A: 0.337422 seconds
+Unique labels for index 2063 and incoming clusterid 13 : 1
+ Label: 13
+Time taken to expand cluster CASE B: 0.216897 seconds
+Time taken to call insertPoint for each point: 28.6225 seconds
+Time taken to merge the clusters: 0 seconds
+INCDBSCAN clustered
+INCDBSCAN clusterID: 30
+Time taken to print clusters: 0.0485505 seconds.
+rm -rf main
