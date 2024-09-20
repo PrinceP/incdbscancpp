@@ -87,7 +87,7 @@ private:
                 if (!visited[currentPoint]) {
                     visited[currentPoint] = true;
                     // auto start = std::chrono::high_resolution_clock::now();
-                    auto neighbors = kdTree.radiusSearch(points[currentPoint], eps);
+                    auto neighbors = kdTree.radiusSearchUsingCache(points[currentPoint], eps);
                     std::vector<size_t> currentNeighbors;
                     for (const auto& neighbor : neighbors) {
                         currentNeighbors.push_back(kdTree.getIndex(neighbor));

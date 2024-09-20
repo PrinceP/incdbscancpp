@@ -177,28 +177,22 @@ public:
                     dfsPath.push_back({currentPoint,currentIndex});
                     // Current point is a core point
                     for (const auto& neighbor : neighbors) {
-                        auto neighbors_of_neighbor = kdTree.radiusSearchUsingCache(neighbor, eps);
-                        if(neighbors_of_neighbor.size() >= minPts){
-                            // Neighbor is a core point
-                            int neighborIndex = kdTree.getIndex(neighbor);
-                            int neighborClusterID = kdTree.getClusterId(neighbor);
-                            if(neighborClusterID != -1){
-                                uniqueLabels.insert(neighborClusterID);
-                            }
-                            else{
-                                if(!visited[neighborIndex]){
-                                    if(visiteddfsPoints.find(neighborIndex) == visiteddfsPoints.end()){
-                                        dfsStack.push({neighbor, neighborIndex});
-                                        dfsPath.push_back({neighbor, neighborIndex});
-                                        visiteddfsPoints.insert(neighborIndex);
-                                    }
+                        //TODO: Same call is needed for below
+                        int neighborIndex = kdTree.getIndex(neighbor);
+                        int neighborClusterID = kdTree.getClusterId(neighbor);
+                        if(neighborClusterID != -1){
+                            uniqueLabels.insert(neighborClusterID);
+                        }
+                        else{
+                            if(!visited[neighborIndex]){
+                                if(visiteddfsPoints.find(neighborIndex) == visiteddfsPoints.end()){
+                                    dfsStack.push({neighbor, neighborIndex});
+                                    dfsPath.push_back({neighbor, neighborIndex});
+                                    visiteddfsPoints.insert(neighborIndex);
                                 }
                             }
                         }
-                        else{
-                            // Neighbor is a border point
-                            //Do nothing
-                        }
+                    
                     }
                 }
                 else{
@@ -235,6 +229,7 @@ public:
         }
         
         // Assign the determined cluster ID to all points in the DFS path
+        //TODO: Need to be O(1)
         for (auto path : dfsPath) {
             kdTree.updateClusterId(path.first, assignClusterID);
         }

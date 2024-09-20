@@ -3,85 +3,385 @@ rm -rf incclusters*.txt
 rm -rf combinedclusters.txt
 g++-11 main.cpp -I include/  -I ../vendor/ -std=c++20 -o main
 ./main
-Time taken to load data: 0.355825 seconds.
-Size of the data1: 1000
-Size of the data2: 1000
-Size of the data3: 1000
-Size of the data4: 5533
-Size of the labels1: 1000
-Size of the labels2: 1000
-Size of the labels3: 1000
-Size of the labels4: 5533
-Size of the shuffled_doubleData1: 1000
-Size of the shuffled_labels1: 1000
-Size of the shuffled_doubleData2: 1000
-Size of the shuffled_labels2: 1000
-Size of the shuffled_doubleData3: 1000
-Size of the shuffled_labels3: 1000
+Time taken to load data: 0.351692 seconds.
+Size of the data1: 2000
+Size of the data2: 2000
+Size of the data3: 2000
+Size of the data4: 2533
+Size of the labels1: 2000
+Size of the labels2: 2000
+Size of the labels3: 2000
+Size of the labels4: 2533
+Size of the shuffled_doubleData1: 2000
+Size of the shuffled_labels1: 2000
+Size of the shuffled_doubleData2: 2000
+Size of the shuffled_labels2: 2000
+Size of the shuffled_doubleData3: 2000
+Size of the shuffled_labels3: 2000
 KDTree size: 0
 DBSCAN declared with eps 1, minPts 5, and 512D vectors
-KDTree size: 1000
-Time taken to insert all the points into the KDTree: 0.005111 seconds
-Time taken to expand cluster: 1.37999 seconds
-Time taken to expand cluster: 0.688969 seconds
-Time taken to expand cluster: 1.17759 seconds
-Time taken to expand cluster: 0.705555 seconds
-Time taken to expand cluster: 1.16555 seconds
-Time taken to expand cluster: 0.332788 seconds
-Time taken to expand cluster: 0.072966 seconds
-Time taken to expand cluster: 0.10343 seconds
-Time taken to expand cluster: 0.241347 seconds
-Time taken to expand cluster: 0.206413 seconds
-Time taken to expand cluster: 0.07257 seconds
-Time taken to expand cluster: 0.103641 seconds
-Time taken to cluster: 6.35719 seconds
-DBSCAN clustered
-Time taken to fit DBSCAN: 6.36234 seconds.
-Time taken to print clusters: 0.011794 seconds.
------------------------------------
-Starting INCDBSCAN with clusterID 12 startingIndex 1000
-INCDBSCAN declared with eps 1, minPts 5, and 512D vectors
-Starting INCDBSCAN with clusterID 12 startingIndex 1000
 KDTree size: 2000
-Time taken to insert all the points into the KDTree: 0.005308 seconds
-Newly added points size : 1000
-Time taken to expand cluster CASE A: 9.88439 seconds
-Time taken to expand cluster CASE A: 1.76292 seconds
-Unique labels for index 1002 and incoming clusterid 11 : 1
- Label: 11
-Time taken to expand cluster CASE B: 6.92609 seconds
-Time taken to expand cluster CASE A: 0.584792 seconds
-Time taken to expand cluster CASE A: 0.734106 seconds
-Time taken to expand cluster CASE A: 1.33187 seconds
-Time taken to expand cluster CASE A: 4.07011 seconds
-Time taken to expand cluster CASE A: 1.41317 seconds
-Time taken to expand cluster CASE A: 0.980055 seconds
-Time taken to call insertPoint for each point: 27.9009 seconds
-Time taken to merge the clusters: 0 seconds
-INCDBSCAN clustered
-INCDBSCAN clusterID: 20
-Time taken to print clusters: 0.0119397 seconds.
+Time taken to insert all the points into the KDTree: 0.010808 seconds
+Time taken to expand cluster: 1.48474 seconds
+Time taken to expand cluster: 2.12441 seconds
+Time taken to expand cluster: 2.35825 seconds
+Time taken to expand cluster: 0.913066 seconds
+Time taken to expand cluster: 2.72113 seconds
+Time taken to expand cluster: 2.40061 seconds
+Time taken to expand cluster: 2.37727 seconds
+Time taken to expand cluster: 0.489219 seconds
+Time taken to expand cluster: 1.38854 seconds
+Time taken to expand cluster: 2.17819 seconds
+Time taken to expand cluster: 0.417968 seconds
+Time taken to expand cluster: 1.42901 seconds
+Time taken to expand cluster: 0.14698 seconds
+Time taken to expand cluster: 1.16875 seconds
+Time taken to expand cluster: 0.701043 seconds
+Time taken to expand cluster: 0.209239 seconds
+Time taken to expand cluster: 0.680378 seconds
+Time taken to expand cluster: 0.565973 seconds
+Time taken to expand cluster: 1.21943 seconds
+Time taken to expand cluster: 0.146553 seconds
+Time taken to cluster: 25.5175 seconds
+DBSCAN clustered
+Time taken to fit DBSCAN: 25.5284 seconds.
+Time taken to print clusters: 0.0249001 seconds.
 -----------------------------------
 Starting INCDBSCAN with clusterID 20 startingIndex 2000
-KDTree size: 3000
-Time taken to insert all the points into the KDTree: 0.005713 seconds
-Newly added points size : 1000
-Time taken to expand cluster CASE A: 2.38462 seconds
-Time taken to expand cluster CASE A: 3.58597 seconds
-Time taken to expand cluster CASE A: 11.4902 seconds
-Time taken to expand cluster CASE A: 3.97014 seconds
-Time taken to expand cluster CASE A: 0.500696 seconds
-Time taken to expand cluster CASE A: 1.04971 seconds
-Time taken to expand cluster CASE A: 1.23169 seconds
-Time taken to expand cluster CASE A: 2.50209 seconds
-Time taken to expand cluster CASE A: 0.775512 seconds
-Time taken to expand cluster CASE A: 0.337422 seconds
-Unique labels for index 2063 and incoming clusterid 13 : 1
- Label: 13
-Time taken to expand cluster CASE B: 0.216897 seconds
-Time taken to call insertPoint for each point: 28.6225 seconds
+INCDBSCAN declared with eps 1, minPts 5, and 512D vectors
+Starting INCDBSCAN with clusterID 20 startingIndex 2000
+KDTree size: 4000
+Time taken to insert all the points into the KDTree: 0.012983 seconds
+Newly added points size : 2000
+Time taken to expand cluster CASE A: 1.29821 seconds
+Time taken to expand cluster CASE A: 4.13155 seconds
+Time taken to expand cluster CASE A: 2.53214 seconds
+Time taken to expand cluster CASE A: 5.09224 seconds
+Time taken to expand cluster CASE A: 1.63262 seconds
+Time taken to expand cluster CASE A: 1.21166 seconds
+Time taken to expand cluster CASE A: 3.87711 seconds
+Time taken to expand cluster CASE A: 3.97384 seconds
+Unique labels for index 2011 and incoming clusterid 28 : 1
+ Label: 4
+Time taken to expand cluster CASE A: 2.12605 seconds
+Time taken to expand cluster CASE A: 3.64116 seconds
+Time taken to expand cluster CASE A: 1.65714 seconds
+Time taken to expand cluster CASE A: 3.00775 seconds
+Time taken to expand cluster CASE A: 1.332 seconds
+Time taken to expand cluster CASE A: 0.541158 seconds
+Time taken to expand cluster CASE A: 2.35774 seconds
+Time taken to expand cluster CASE A: 0.663714 seconds
+Time taken to expand cluster CASE A: 1.88214 seconds
+Time taken to expand cluster CASE A: 1.53948 seconds
+Time taken to expand cluster CASE A: 0.839856 seconds
+Time taken to expand cluster CASE A: 0.171864 seconds
+Time taken to expand cluster CASE A: 1.01231 seconds
+Time taken to expand cluster CASE A: 1.33597 seconds
+Time taken to expand cluster CASE A: 1.14494 seconds
+Time taken to expand cluster CASE A: 0.445236 seconds
+Unique labels for index 2223 and incoming clusterid 0 : 1
+ Label: 0
+Time taken to expand cluster CASE B: 0.250113 seconds
+Unique labels for index 2351 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.00047 seconds
+Unique labels for index 2362 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000737 seconds
+Unique labels for index 2397 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000277 seconds
+Unique labels for index 2468 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000173 seconds
+Unique labels for index 2700 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000674 seconds
+Unique labels for index 2797 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.00054 seconds
+Unique labels for index 2898 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000676 seconds
+Unique labels for index 3016 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000574 seconds
+Unique labels for index 3114 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000558 seconds
+Unique labels for index 3285 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000592 seconds
+Unique labels for index 3290 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000555 seconds
+Unique labels for index 3291 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000838 seconds
+Unique labels for index 3365 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000573 seconds
+Unique labels for index 3399 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000797 seconds
+Unique labels for index 3425 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.00069 seconds
+Unique labels for index 3431 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000374 seconds
+Unique labels for index 3438 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000596 seconds
+Unique labels for index 3479 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000186 seconds
+Unique labels for index 3492 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000781 seconds
+Unique labels for index 3540 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000802 seconds
+Unique labels for index 3602 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000609 seconds
+Unique labels for index 3606 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000199 seconds
+Unique labels for index 3630 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000773 seconds
+Unique labels for index 3665 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000914 seconds
+Unique labels for index 3677 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.00041 seconds
+Unique labels for index 3707 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000926 seconds
+Unique labels for index 3759 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000136 seconds
+Unique labels for index 3786 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000486 seconds
+Unique labels for index 3891 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000639 seconds
+Unique labels for index 3973 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000851 seconds
+Unique labels for index 3995 and incoming clusterid 4 : 1
+ Label: 4
+Time taken to expand cluster CASE B: 0.000368 seconds
+Time taken to call insertPoint for each point: 49.1852 seconds
 Time taken to merge the clusters: 0 seconds
 INCDBSCAN clustered
-INCDBSCAN clusterID: 30
-Time taken to print clusters: 0.0485505 seconds.
+INCDBSCAN clusterID: 44
+Time taken to print clusters: 0.0259958 seconds.
+-----------------------------------
+Starting INCDBSCAN with clusterID 44 startingIndex 4000
+KDTree size: 6000
+Time taken to insert all the points into the KDTree: 0.013309 seconds
+Newly added points size : 2000
+Unique labels for index 4000 and incoming clusterid 44 : 1
+ Label: 12
+Time taken to expand cluster CASE A: 2.40555 seconds
+Time taken to expand cluster CASE A: 1.70393 seconds
+Time taken to expand cluster CASE A: 4.40796 seconds
+Time taken to expand cluster CASE A: 5.39433 seconds
+Time taken to expand cluster CASE A: 1.88373 seconds
+Unique labels for index 4005 and incoming clusterid 49 : 1
+ Label: 35
+Time taken to expand cluster CASE A: 1.89733 seconds
+Time taken to expand cluster CASE A: 3.06026 seconds
+Time taken to expand cluster CASE A: 2.92245 seconds
+Time taken to expand cluster CASE A: 4.09801 seconds
+Time taken to expand cluster CASE A: 6.16506 seconds
+Time taken to expand cluster CASE A: 3.78947 seconds
+Time taken to expand cluster CASE A: 5.06346 seconds
+Time taken to expand cluster CASE A: 3.34851 seconds
+Unique labels for index 4023 and incoming clusterid 57 : 1
+ Label: 30
+Time taken to expand cluster CASE A: 2.19238 seconds
+Time taken to expand cluster CASE A: 1.47728 seconds
+Time taken to expand cluster CASE A: 6.44718 seconds
+Time taken to expand cluster CASE A: 2.71753 seconds
+Unique labels for index 4040 and incoming clusterid 61 : 1
+ Label: 21
+Time taken to expand cluster CASE A: 1.88854 seconds
+Time taken to expand cluster CASE A: 0.557449 seconds
+Time taken to expand cluster CASE A: 3.52917 seconds
+Time taken to expand cluster CASE A: 1.14881 seconds
+Time taken to expand cluster CASE A: 1.87009 seconds
+Time taken to expand cluster CASE A: 1.67394 seconds
+Time taken to expand cluster CASE A: 0.778319 seconds
+Unique labels for index 4322 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001384 seconds
+Unique labels for index 4326 and incoming clusterid 26 : 1
+ Label: 26
+Time taken to expand cluster CASE B: 0.487549 seconds
+Unique labels for index 4348 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001093 seconds
+Unique labels for index 4414 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001155 seconds
+Unique labels for index 4418 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001099 seconds
+Unique labels for index 4575 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.000681 seconds
+Unique labels for index 4633 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001243 seconds
+Unique labels for index 4686 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001376 seconds
+Unique labels for index 4706 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001029 seconds
+Unique labels for index 4719 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.000114 seconds
+Unique labels for index 4750 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001333 seconds
+Unique labels for index 4787 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.000995 seconds
+Unique labels for index 4840 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.000351 seconds
+Unique labels for index 4844 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.000656 seconds
+Unique labels for index 4859 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001203 seconds
+Unique labels for index 5060 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001329 seconds
+Unique labels for index 5144 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.000537 seconds
+Unique labels for index 5166 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001054 seconds
+Unique labels for index 5171 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001346 seconds
+Unique labels for index 5323 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.000912 seconds
+Unique labels for index 5329 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001367 seconds
+Unique labels for index 5336 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001154 seconds
+Unique labels for index 5394 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001115 seconds
+Unique labels for index 5404 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001254 seconds
+Unique labels for index 5405 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001252 seconds
+Unique labels for index 5431 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.000804 seconds
+Unique labels for index 5448 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001289 seconds
+Unique labels for index 5499 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001543 seconds
+Unique labels for index 5559 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001228 seconds
+Unique labels for index 5566 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.000546 seconds
+Unique labels for index 5588 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001277 seconds
+Unique labels for index 5610 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001294 seconds
+Unique labels for index 5626 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.000653 seconds
+Unique labels for index 5665 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.000109 seconds
+Unique labels for index 5668 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.000846 seconds
+Unique labels for index 5679 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001178 seconds
+Unique labels for index 5688 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.00126 seconds
+Unique labels for index 5695 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001431 seconds
+Unique labels for index 5715 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001219 seconds
+Unique labels for index 5732 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001485 seconds
+Unique labels for index 5745 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001483 seconds
+Unique labels for index 5747 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001475 seconds
+Unique labels for index 5761 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001268 seconds
+Unique labels for index 5769 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001449 seconds
+Unique labels for index 5791 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001136 seconds
+Unique labels for index 5818 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001432 seconds
+Unique labels for index 5826 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001132 seconds
+Unique labels for index 5833 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001468 seconds
+Unique labels for index 5888 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001377 seconds
+Unique labels for index 5894 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001393 seconds
+Unique labels for index 5914 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.000957 seconds
+Unique labels for index 5918 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001401 seconds
+Unique labels for index 5922 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001244 seconds
+Unique labels for index 5953 and incoming clusterid 52 : 1
+ Label: 52
+Time taken to expand cluster CASE B: 0.001552 seconds
+Time taken to call insertPoint for each point: 72.8301 seconds
+Time taken to merge the clusters: 0 seconds
+INCDBSCAN clustered
+INCDBSCAN clusterID: 68
+Time taken to print clusters: 0.105701 seconds.
 rm -rf main

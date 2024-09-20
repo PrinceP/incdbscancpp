@@ -61,7 +61,7 @@ int main() {
     std::chrono::duration<double> load_time = end - start;
     std::cout << "Time taken to load data: " << load_time.count() << " seconds." << std::endl;
     //Divide doubleData into 2 parts
-    int sliced_index = 1000;
+    int sliced_index = 2000;
     std::vector<std::vector<double>> doubleData1(doubleData.begin(), doubleData.begin() + sliced_index);
     std::vector<std::vector<double>> doubleData2(doubleData.begin() + sliced_index, doubleData.begin() + 2*sliced_index);
     std::vector<std::vector<double>> doubleData3(doubleData.begin() + 2*sliced_index, doubleData.begin() + 3*sliced_index);
