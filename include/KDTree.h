@@ -164,6 +164,12 @@ public:
         return -1;
     }
 
+    //Get the node of a point
+    NodePtr getNode(const std::vector<double>& point) const {
+        return findNode(root, point, 0);
+    }
+    
+
 private:
     int dimensions;
     NodePtr root;
@@ -252,6 +258,7 @@ private:
     }
 
     double distance(const std::vector<double>& a, const std::vector<double>& b) const {
+        //TODO: Implement a more efficient distance calculation
         double dist = 0.0;
         for (size_t i = 0; i < a.size(); ++i) {
             dist += (a[i] - b[i]) * (a[i] - b[i]);

@@ -87,7 +87,7 @@ public:
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
         double durationInSeconds = duration / 1e6; // Convert microseconds to seconds
-        // std::cout << "Time taken to find neighbors for index " << index << " : " << durationInSeconds << " seconds" << std::endl;
+        std::cout << "Time taken to find neighbors for index " << index << " : " << durationInSeconds << " seconds" << std::endl;
 
         // Debug
         // std::cout << "Found " << neighbors.size() << " neighbors." << " for index " << index << std::endl;
@@ -164,7 +164,8 @@ public:
         std::unordered_set<int> uniqueLabels;
         
         dfsStack.push({currentPoint, index});
-
+        auto start = std::chrono::high_resolution_clock::now();
+        
         while (!dfsStack.empty()) {
             auto [point, currentIndex] = dfsStack.top();
             dfsStack.pop();
@@ -174,12 +175,15 @@ public:
                 auto neighbors = kdTree.radiusSearchUsingCache(point, eps);
                 
                 if (neighbors.size() >= minPts) {
-                    dfsPath.push_back({currentPoint,currentIndex});
+                    dfsPath.push_back({point,currentIndex});
                     // Current point is a core point
                     for (const auto& neighbor : neighbors) {
                         //TODO: Same call is needed for below
-                        int neighborIndex = kdTree.getIndex(neighbor);
-                        int neighborClusterID = kdTree.getClusterId(neighbor);
+                        // int neighborIndex = kdTree.getIndex(neighbor);
+                        // int neighborClusterID = kdTree.getClusterId(neighbor);
+                        auto neighborNode = kdTree.getNode(neighbor);
+                        int neighborIndex = neighborNode->index;
+                        int neighborClusterID = neighborNode->clusterId;
                         if(neighborClusterID != -1){
                             uniqueLabels.insert(neighborClusterID);
                         }
@@ -202,15 +206,19 @@ public:
                 
             }
         }
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+        double durationInSeconds = duration / 1e6;
+        std::cout << "Time taken to perform DFS: " << durationInSeconds << " seconds" << std::endl;
 
         //Debug
-        if(uniqueLabels.size() != 0){
-            std::cout << "Unique labels for index "  << index <<" and incoming clusterid " << clusterID << " : " << uniqueLabels.size() << std::endl;
-            for(auto label : uniqueLabels){
-                std::cout << " Label: " << label;
-            }
-            std::cout << std::endl;
-        }
+        // if(uniqueLabels.size() != 0){
+        //     std::cout << "Unique labels for index "  << index <<" and incoming clusterid " << clusterID << " : " << uniqueLabels.size() << std::endl;
+        //     for(auto label : uniqueLabels){
+        //         std::cout << " Label: " << label;
+        //     }
+        //     std::cout << std::endl;
+        // }
         
         // Determine the cluster ID to assign
         int assignClusterID;
@@ -230,9 +238,15 @@ public:
         
         // Assign the determined cluster ID to all points in the DFS path
         //TODO: Need to be O(1)
+        start = std::chrono::high_resolution_clock::now();
         for (auto path : dfsPath) {
-            kdTree.updateClusterId(path.first, assignClusterID);
+            // kdTree.updateClusterId(path.first, assignClusterID);
+            kdTree.nodes[path.second]->clusterId = assignClusterID;
         }
+        end = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+        durationInSeconds = duration / 1e6;
+        std::cout << "Time taken to assign cluster ID: " << durationInSeconds << " seconds" << std::endl;
     }
 
     void getLastClusterId(int& clusterId){

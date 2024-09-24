@@ -60,17 +60,41 @@ int main() {
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> load_time = end - start;
     std::cout << "Time taken to load data: " << load_time.count() << " seconds." << std::endl;
+
+    // Randomize the data and labels for doubleData0 and labels0
+    // Create a vector of indices
+    std::vector<size_t> indices0(doubleData.size());
+    std::iota(indices0.begin(), indices0.end(), 0);
+
+    // Shuffle the indices0
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(indices0.begin(), indices0.end(), g);
+
+    // Create new vectors to store shuffled data
+    std::vector<std::vector<double>> shuffled_doubleData(doubleData.size());
+    std::vector<std::string> shuffled_labels0(labels.size());
+
+    // Use the shuffled indices0 to reorder both doubleData and labels
+    for (size_t i = 0; i < indices0.size(); ++i) {
+        shuffled_doubleData[i] = doubleData[indices0[i]];
+        shuffled_labels0[i] = labels[indices0[i]];
+    }
+    std::cout << "Size of the shuffled_doubleData: " << shuffled_doubleData.size() << std::endl;
+    std::cout << "Size of the shuffled_labels: " << shuffled_labels0.size() << std::endl;
+
+
     //Divide doubleData into 2 parts
-    int sliced_index = 2000;
-    std::vector<std::vector<double>> doubleData1(doubleData.begin(), doubleData.begin() + sliced_index);
-    std::vector<std::vector<double>> doubleData2(doubleData.begin() + sliced_index, doubleData.begin() + 2*sliced_index);
-    std::vector<std::vector<double>> doubleData3(doubleData.begin() + 2*sliced_index, doubleData.begin() + 3*sliced_index);
-    std::vector<std::vector<double>> doubleData4(doubleData.begin() + 3*sliced_index, doubleData.end());
+    int sliced_index = 1000;
+    std::vector<std::vector<double>> doubleData1(shuffled_doubleData.begin(), shuffled_doubleData.begin() + sliced_index);
+    std::vector<std::vector<double>> doubleData2(shuffled_doubleData.begin() + sliced_index, shuffled_doubleData.begin() + 2*sliced_index);
+    std::vector<std::vector<double>> doubleData3(shuffled_doubleData.begin() + 2*sliced_index, shuffled_doubleData.begin() + 3*sliced_index);
+    std::vector<std::vector<double>> doubleData4(shuffled_doubleData.begin() + 3*sliced_index, shuffled_doubleData.end());
     //Divide labels
-    std::vector<std::string> labels1(labels.begin(), labels.begin() + sliced_index);
-    std::vector<std::string> labels2(labels.begin() + sliced_index, labels.begin() + 2*sliced_index);
-    std::vector<std::string> labels3(labels.begin() + 2*sliced_index, labels.begin() + 3*sliced_index);
-    std::vector<std::string> labels4(labels.begin() + 3*sliced_index, labels.end());
+    std::vector<std::string> labels1(shuffled_labels0.begin(), shuffled_labels0.begin() + sliced_index);
+    std::vector<std::string> labels2(shuffled_labels0.begin() + sliced_index, shuffled_labels0.begin() + 2*sliced_index);
+    std::vector<std::string> labels3(shuffled_labels0.begin() + 2*sliced_index, shuffled_labels0.begin() + 3*sliced_index);
+    std::vector<std::string> labels4(shuffled_labels0.begin() + 3*sliced_index, shuffled_labels0.end());
 
     //Size of the data
     std::cout << "Size of the data1: " << doubleData1.size() << std::endl;
@@ -87,8 +111,8 @@ int main() {
     std::iota(indices.begin(), indices.end(), 0);
 
     // Shuffle the indices
-    std::random_device rd;
-    std::mt19937 g(rd());
+    // std::random_device rd;
+    // std::mt19937 g(rd());
     std::shuffle(indices.begin(), indices.end(), g);
 
     // Create new vectors to store shuffled data
