@@ -61,7 +61,9 @@ public:
 
         // Iterate through merge pairs and keep track of the last conversion
         for (const auto& merge_cluster_pair : merge_cluster_pairs) {
-            cleaned_merges[merge_cluster_pair.first] = merge_cluster_pair.second;
+            if(merge_cluster_pair.first != merge_cluster_pair.second){
+                cleaned_merges[merge_cluster_pair.first] = merge_cluster_pair.second;
+            }
         }
         // merge_cluster_pairs.erase(std::unique(merge_cluster_pairs.begin(), merge_cluster_pairs.end()), merge_cluster_pairs.end());
         //Benchmark the time taken to merge the clusters
@@ -158,31 +160,33 @@ public:
     }
 
     void modified_expandCluster(const std::vector<double>& currentPoint, int index, int clusterID) {
-        std::stack<std::pair<std::vector<double>, int>> dfsStack;
-        std::vector<std::pair<std::vector<double>, int>> dfsPath;
+        std::stack<int> dfsStack;
+        std::vector<int> dfsPath;
         std::unordered_set<int> visiteddfsPoints;
         std::unordered_set<int> uniqueLabels;
         
-        dfsStack.push({currentPoint, index});
+        dfsStack.push({index});
         auto start = std::chrono::high_resolution_clock::now();
         
         while (!dfsStack.empty()) {
-            auto [point, currentIndex] = dfsStack.top();
+            auto currentIndex = dfsStack.top();
             dfsStack.pop();
             if (!visited[currentIndex]) {
                 visited[currentIndex] = true;
                 
-                auto neighbors = kdTree.radiusSearchUsingCache(point, eps);
-                
-                if (neighbors.size() >= minPts) {
-                    dfsPath.push_back({point,currentIndex});
+                auto neighbors = kdTree.radiusSearchUsingCache(kdTree.nodes[currentIndex]->point, eps);
+                // std::cout << "Found " << neighbors.size() << " neighbors for index " << currentIndex << std::endl;
+                std::vector<size_t> currentNeighbors;
+                for (const auto& neighbor : neighbors) {
+                    currentNeighbors.push_back(kdTree.getIndex(neighbor));
+                }
+                if (currentNeighbors.size() >= minPts) {
+                    
+                    dfsPath.push_back(currentIndex);
+                    
                     // Current point is a core point
-                    for (const auto& neighbor : neighbors) {
-                        //TODO: Same call is needed for below
-                        // int neighborIndex = kdTree.getIndex(neighbor);
-                        // int neighborClusterID = kdTree.getClusterId(neighbor);
-                        auto neighborNode = kdTree.getNode(neighbor);
-                        int neighborIndex = neighborNode->index;
+                    for (const auto& neighborIndex : currentNeighbors) {
+                        auto neighborNode = kdTree.nodes[neighborIndex];
                         int neighborClusterID = neighborNode->clusterId;
                         if(neighborClusterID != -1){
                             uniqueLabels.insert(neighborClusterID);
@@ -190,8 +194,8 @@ public:
                         else{
                             if(!visited[neighborIndex]){
                                 if(visiteddfsPoints.find(neighborIndex) == visiteddfsPoints.end()){
-                                    dfsStack.push({neighbor, neighborIndex});
-                                    dfsPath.push_back({neighbor, neighborIndex});
+                                    dfsStack.push(neighborIndex);
+                                    dfsPath.push_back(neighborIndex);
                                     visiteddfsPoints.insert(neighborIndex);
                                 }
                             }
@@ -199,11 +203,6 @@ public:
                     
                     }
                 }
-                else{
-                    // Current point is a border point
-                    // Do nothing
-                }
-                
             }
         }
         auto end = std::chrono::high_resolution_clock::now();
@@ -238,15 +237,15 @@ public:
         
         // Assign the determined cluster ID to all points in the DFS path
         //TODO: Need to be O(1)
-        start = std::chrono::high_resolution_clock::now();
-        for (auto path : dfsPath) {
+        // start = std::chrono::high_resolution_clock::now();
+        for (auto pathIndex : dfsPath) {
             // kdTree.updateClusterId(path.first, assignClusterID);
-            kdTree.nodes[path.second]->clusterId = assignClusterID;
+            kdTree.nodes[pathIndex]->clusterId = assignClusterID;
         }
-        end = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-        durationInSeconds = duration / 1e6;
-        std::cout << "Time taken to assign cluster ID: " << durationInSeconds << " seconds" << std::endl;
+        // end = std::chrono::high_resolution_clock::now();
+        // duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+        // durationInSeconds = duration / 1e6;
+        // std::cout << "Time taken to assign cluster ID: " << durationInSeconds << " seconds" << std::endl;
     }
 
     void getLastClusterId(int& clusterId){

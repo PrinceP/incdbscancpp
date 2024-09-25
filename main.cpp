@@ -48,6 +48,60 @@ std::vector<std::vector<float>> load_npy_files(const std::string& base_dir, std:
     return data;
 }
 
+// Function to shuffle data and labels
+void shuffleDataAndLabels(std::vector<std::vector<double>>& data, std::vector<std::string>& labels) {
+    // Create a vector of indices
+    std::vector<size_t> indices(data.size());
+    std::iota(indices.begin(), indices.end(), 0);
+
+    // Shuffle the indices
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(indices.begin(), indices.end(), g);
+
+    // Create new vectors to store shuffled data
+    std::vector<std::vector<double>> shuffledData(data.size());
+    std::vector<std::string> shuffledLabels(labels.size());
+
+    // Use the shuffled indices to reorder both data and labels
+    for (size_t i = 0; i < indices.size(); ++i) {
+        shuffledData[i] = data[indices[i]];
+        shuffledLabels[i] = labels[indices[i]];
+    }
+
+    // Swap the original data and labels with the shuffled ones
+    data.swap(shuffledData);
+    labels.swap(shuffledLabels);
+}
+
+// Function to split data into parts
+std::vector<std::vector<std::vector<double>>> splitData(const std::vector<std::vector<double>>& data, size_t partSize) {
+    std::vector<std::vector<std::vector<double>>> parts;
+    for (size_t i = 0; i < data.size(); i += partSize) {
+        parts.push_back(std::vector<std::vector<double>>(data.begin() + i, data.begin() + std::min(i + partSize, data.size())));
+    }
+    return parts;
+}
+
+// Function to split labels into parts
+std::vector<std::vector<std::string>> splitLabels(const std::vector<std::string>& labels, size_t partSize) {
+    std::vector<std::vector<std::string>> parts;
+    for (size_t i = 0; i < labels.size(); i += partSize) {
+        parts.push_back(std::vector<std::string>(labels.begin() + i, labels.begin() + std::min(i + partSize, labels.size())));
+    }
+    return parts;
+}
+
+// Function to dump cluster results into a file
+void dumpClustersToFile(const std::string& filename, const std::vector<std::vector<double>>& data, const std::vector<std::string>& labels, KDTree& kdTree) {
+    std::ofstream outfile(filename, std::ios_base::app);
+    for (size_t i = 0; i < data.size(); ++i) {
+        std::string cluster = std::to_string(kdTree.getClusterId(data[i]));
+        std::string result = labels[i] + "," + cluster;
+        outfile << result << std::endl;
+    }
+    outfile.close();
+}
 
 int main() {
 
@@ -61,113 +115,19 @@ int main() {
     std::chrono::duration<double> load_time = end - start;
     std::cout << "Time taken to load data: " << load_time.count() << " seconds." << std::endl;
 
-    // Randomize the data and labels for doubleData0 and labels0
-    // Create a vector of indices
-    std::vector<size_t> indices0(doubleData.size());
-    std::iota(indices0.begin(), indices0.end(), 0);
+    // Shuffle the data and labels
+    shuffleDataAndLabels(doubleData, labels);
 
-    // Shuffle the indices0
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(indices0.begin(), indices0.end(), g);
+    // Split the data and labels into parts
+    size_t partSize = 1000;
+    auto dataParts = splitData(doubleData, partSize);
+    auto labelParts = splitLabels(labels, partSize);
 
-    // Create new vectors to store shuffled data
-    std::vector<std::vector<double>> shuffled_doubleData(doubleData.size());
-    std::vector<std::string> shuffled_labels0(labels.size());
-
-    // Use the shuffled indices0 to reorder both doubleData and labels
-    for (size_t i = 0; i < indices0.size(); ++i) {
-        shuffled_doubleData[i] = doubleData[indices0[i]];
-        shuffled_labels0[i] = labels[indices0[i]];
+    // Log the sizes of the data and labels parts
+    for (size_t i = 0; i < dataParts.size(); ++i) {
+        std::cout << "Size of the data part " << i + 1 << ": " << dataParts[i].size() << std::endl;
+        std::cout << "Size of the labels part " << i + 1 << ": " << labelParts[i].size() << std::endl;
     }
-    std::cout << "Size of the shuffled_doubleData: " << shuffled_doubleData.size() << std::endl;
-    std::cout << "Size of the shuffled_labels: " << shuffled_labels0.size() << std::endl;
-
-
-    //Divide doubleData into 2 parts
-    int sliced_index = 1000;
-    std::vector<std::vector<double>> doubleData1(shuffled_doubleData.begin(), shuffled_doubleData.begin() + sliced_index);
-    std::vector<std::vector<double>> doubleData2(shuffled_doubleData.begin() + sliced_index, shuffled_doubleData.begin() + 2*sliced_index);
-    std::vector<std::vector<double>> doubleData3(shuffled_doubleData.begin() + 2*sliced_index, shuffled_doubleData.begin() + 3*sliced_index);
-    std::vector<std::vector<double>> doubleData4(shuffled_doubleData.begin() + 3*sliced_index, shuffled_doubleData.end());
-    //Divide labels
-    std::vector<std::string> labels1(shuffled_labels0.begin(), shuffled_labels0.begin() + sliced_index);
-    std::vector<std::string> labels2(shuffled_labels0.begin() + sliced_index, shuffled_labels0.begin() + 2*sliced_index);
-    std::vector<std::string> labels3(shuffled_labels0.begin() + 2*sliced_index, shuffled_labels0.begin() + 3*sliced_index);
-    std::vector<std::string> labels4(shuffled_labels0.begin() + 3*sliced_index, shuffled_labels0.end());
-
-    //Size of the data
-    std::cout << "Size of the data1: " << doubleData1.size() << std::endl;
-    std::cout << "Size of the data2: " << doubleData2.size() << std::endl;
-    std::cout << "Size of the data3: " << doubleData3.size() << std::endl;
-    std::cout << "Size of the data4: " << doubleData4.size() << std::endl;  
-    std::cout << "Size of the labels1: " << labels1.size() << std::endl;
-    std::cout << "Size of the labels2: " << labels2.size() << std::endl;
-    std::cout << "Size of the labels3: " << labels3.size() << std::endl;
-    std::cout << "Size of the labels4: " << labels4.size() << std::endl;
-    // Randomize the data and labels for doubleData1 and labels1
-    // Create a vector of indices
-    std::vector<size_t> indices(doubleData1.size());
-    std::iota(indices.begin(), indices.end(), 0);
-
-    // Shuffle the indices
-    // std::random_device rd;
-    // std::mt19937 g(rd());
-    std::shuffle(indices.begin(), indices.end(), g);
-
-    // Create new vectors to store shuffled data
-    std::vector<std::vector<double>> shuffled_doubleData1(doubleData1.size());
-    std::vector<std::string> shuffled_labels1(labels1.size());
-
-    // Use the shuffled indices to reorder both doubleData1 and labels1
-    for (size_t i = 0; i < indices.size(); ++i) {
-        shuffled_doubleData1[i] = doubleData1[indices[i]];
-        shuffled_labels1[i] = labels1[indices[i]];
-    }
-    std::cout << "Size of the shuffled_doubleData1: " << shuffled_doubleData1.size() << std::endl;
-    std::cout << "Size of the shuffled_labels1: " << shuffled_labels1.size() << std::endl;
-
-
-    //Randomize the data and labels for doubleData2 and labels2
-    // Create a vector of indices
-    std::vector<size_t> indices2(doubleData2.size());
-    std::iota(indices2.begin(), indices2.end(), 0);
-
-    // Shuffle the indices
-    std::shuffle(indices2.begin(), indices2.end(), g);
-    
-    // Create new vectors to store shuffled data
-    std::vector<std::vector<double>> shuffled_doubleData2(doubleData2.size());
-    std::vector<std::string> shuffled_labels2(labels2.size());
-
-    // Use the shuffled indices to reorder both doubleData2 and labels2
-    for (size_t i = 0; i < indices2.size(); ++i) {
-        shuffled_doubleData2[i] = doubleData2[indices2[i]];
-        shuffled_labels2[i] = labels2[indices2[i]];
-    }
-    std::cout << "Size of the shuffled_doubleData2: " << shuffled_doubleData2.size() << std::endl;
-    std::cout << "Size of the shuffled_labels2: " << shuffled_labels2.size() << std::endl;
-
-    //Randomize the data and labels for doubleData3 and labels3
-    // Create a vector of indices
-    std::vector<size_t> indices3(doubleData3.size());
-    std::iota(indices3.begin(), indices3.end(), 0);
-
-    // Shuffle the indices
-    std::shuffle(indices3.begin(), indices3.end(), g);
-
-    // Create new vectors to store shuffled data
-    std::vector<std::vector<double>> shuffled_doubleData3(doubleData3.size());
-    std::vector<std::string> shuffled_labels3(labels3.size());
-
-    // Use the shuffled indices to reorder both doubleData3 and labels3
-    for (size_t i = 0; i < indices3.size(); ++i) {
-        shuffled_doubleData3[i] = doubleData3[indices3[i]];
-        shuffled_labels3[i] = labels3[indices3[i]];
-    }
-    std::cout << "Size of the shuffled_doubleData3: " << shuffled_doubleData3.size() << std::endl;
-    std::cout << "Size of the shuffled_labels3: " << shuffled_labels3.size() << std::endl;
-
 
     double eps = 1.0;
     int minPts = 5;
@@ -179,112 +139,45 @@ int main() {
     DBSCAN dbscan(eps, minPts, kdTree, clusterID);
     std::cout << "DBSCAN declared with eps " << eps << ", minPts " << minPts << ", and " << dimensions << "D vectors" << std::endl;
 
+    // Cluster the first part of the data using DBSCAN
     start = std::chrono::high_resolution_clock::now();
-    dbscan.cluster(shuffled_doubleData1);
+    dbscan.cluster(dataParts[0]);
     std::cout << "DBSCAN clustered" << std::endl;
     
     end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> fit_time = end - start;
     std::cout << "Time taken to fit DBSCAN: " << fit_time.count() << " seconds." << std::endl;
+    
+    dbscan.getLastClusterId(clusterID);
+    // Dump the first set of cluster results into a file
+    dumpClustersToFile("clusters.txt", dataParts[0], labelParts[0], kdTree);
 
-
-    start = std::chrono::high_resolution_clock::now();
-    std::vector<int> clusterLabels;
-    dbscan.getClustersLabels(clusterLabels, clusterID);
-    // Dump it into a file
-    for (size_t i = 0; i < shuffled_doubleData1.size(); ++i) {
-        std::string output_file = "clusters.txt";
-        std::ofstream outfile(output_file, std::ios_base::app);
-        std::string cluster = std::to_string(kdTree.getClusterId(shuffled_doubleData1[i]));
-        std::string result = shuffled_labels1[i] + "," + cluster;
-        outfile << result << std::endl;
-        outfile.close();
-    }
-    end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> print_time = end - start;
-    std::cout << "Time taken to print clusters: " << print_time.count() << " seconds." << std::endl;
-
-    std::cout << "-----------------------------------" << std::endl;
-    //INCDBSCAN
-    eps = 1.0;
-    int startingIndex = sliced_index;
-    std::cout << "Starting INCDBSCAN with clusterID " << clusterID << " startingIndex " << startingIndex << std::endl;
+    // INCDBSCAN
     INCDBSCAN incdbscan(eps, minPts, kdTree);
     std::cout << "INCDBSCAN declared with eps " << eps << ", minPts " << minPts << ", and " << dimensions << "D vectors" << std::endl;
 
-    incdbscan.cluster(shuffled_doubleData2, clusterID, startingIndex);
-    std::cout << "INCDBSCAN clustered" << std::endl;
-    start = std::chrono::high_resolution_clock::now();
-    std::vector<int> incclusterLabels;
-    int incclusterID;
-    // incdbscan.getClustersLabels(incclusterLabels, incclusterID);
-    incdbscan.getLastClusterId(incclusterID);
-    std::cout << "INCDBSCAN clusterID: " << incclusterID << std::endl;
-    
-    // Dump it into a file
-    for (size_t i = 0; i < shuffled_doubleData2.size(); ++i) {
-        std::string output_file = "incclusters.txt";
-        std::ofstream outfile(output_file, std::ios_base::app);
-        std::string cluster = std::to_string(kdTree.getClusterId(shuffled_doubleData2[i]));
-        std::string result = shuffled_labels2[i] + "," + cluster;
-        outfile << result << std::endl;
-        outfile.close();
-    }
-    end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> incprint_time = end - start;
-    std::cout << "Time taken to print clusters: " << incprint_time.count() << " seconds." << std::endl;
-    std::cout << "-----------------------------------" << std::endl;
+    // Cluster the remaining parts of the data using INCDBSCAN
+    for (size_t i = 1; i < dataParts.size(); ++i) {
+        start = std::chrono::high_resolution_clock::now();
+        incdbscan.cluster(dataParts[i], clusterID, i * partSize);
+        std::cout << "INCDBSCAN clustered part " << i + 1 << std::endl;
+        
+        int lastClusterID;
+        incdbscan.getLastClusterId(lastClusterID);
+        clusterID = lastClusterID;
 
-    startingIndex = 2*sliced_index;
-    clusterID = incclusterID;
-    
-    incdbscan.cluster(shuffled_doubleData3, clusterID, startingIndex);
-    std::cout << "INCDBSCAN clustered" << std::endl;
-    start = std::chrono::high_resolution_clock::now();
-    std::vector<int> incclusterLabels3;
-    int incclusterID3;
-    // incdbscan.getClustersLabels(incclusterLabels3, incclusterID3);
-    incdbscan.getLastClusterId(incclusterID3);
-    std::cout << "INCDBSCAN clusterID: " << incclusterID3 << std::endl;
+        // Dump the incremental cluster results into a file
+        dumpClustersToFile("incclusters" + std::to_string(i) + ".txt", dataParts[i], labelParts[i], kdTree);
 
-    // Dump it into a file
-    for (size_t i = 0; i < shuffled_doubleData3.size(); ++i) {
-        std::string output_file = "incclusters2.txt";
-        std::ofstream outfile(output_file, std::ios_base::app);
-        std::string cluster = std::to_string(kdTree.getClusterId(shuffled_doubleData3[i]));
-        std::string result = shuffled_labels3[i] + "," + cluster;
-        outfile << result << std::endl;
-        outfile.close();
+        end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> incprint_time = end - start;
+        std::cout << "Time taken to print clusters for part " << i + 1 << ": " << incprint_time.count() << " seconds." << std::endl;
     }
 
-    for(int i = 0; i < shuffled_doubleData1.size(); i++){
-        std::string output_file = "combinedclusters.txt";
-        std::ofstream outfile(output_file, std::ios_base::app);
-        std::string cluster = std::to_string(kdTree.getClusterId(shuffled_doubleData1[i]));
-        std::string result = shuffled_labels1[i] + "," + cluster;
-        outfile << result << std::endl;
-        outfile.close();
+    // Dump combined results
+    for (size_t i = 0; i < dataParts.size(); ++i) {
+        dumpClustersToFile("combinedclusters.txt", dataParts[i], labelParts[i], kdTree);
     }
-    for(int i = 0; i < shuffled_doubleData2.size(); i++){
-        std::string output_file = "combinedclusters.txt";
-        std::ofstream outfile(output_file, std::ios_base::app);
-        std::string cluster = std::to_string(kdTree.getClusterId(shuffled_doubleData2[i]));
-        std::string result = shuffled_labels2[i] + "," + cluster;
-        outfile << result << std::endl;
-        outfile.close();
-    }
-    for(int i = 0; i < shuffled_doubleData3.size(); i++){
-        std::string output_file = "combinedclusters.txt";
-        std::ofstream outfile(output_file, std::ios_base::app);
-        std::string cluster = std::to_string(kdTree.getClusterId(shuffled_doubleData3[i]));
-        std::string result = shuffled_labels3[i] + "," + cluster;
-        outfile << result << std::endl;
-        outfile.close();
-    }
-    end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> incprint_time3 = end - start;
-    std::cout << "Time taken to print clusters: " << incprint_time3.count() << " seconds." << std::endl;
-    
-    
+
     return 0;
 }

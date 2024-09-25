@@ -52,6 +52,10 @@ public:
         clusterID = this->clusterID;
     }
 
+    void getLastClusterId(int& clusterId){
+        clusterId = this->clusterID;
+    }
+
 private:
     double eps;
     int minPts;
@@ -88,6 +92,7 @@ private:
                     visited[currentPoint] = true;
                     // auto start = std::chrono::high_resolution_clock::now();
                     auto neighbors = kdTree.radiusSearchUsingCache(points[currentPoint], eps);
+                    // std::cout << "Found " << neighbors.size() << " neighbors for index " << currentPoint << std::endl;
                     std::vector<size_t> currentNeighbors;
                     for (const auto& neighbor : neighbors) {
                         currentNeighbors.push_back(kdTree.getIndex(neighbor));
